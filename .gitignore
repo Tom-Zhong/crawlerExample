@@ -1,0 +1,5 @@
+*.html
+*.csv
+img/
+env/
+.DS_Store
