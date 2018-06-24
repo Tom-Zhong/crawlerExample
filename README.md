@@ -1,1 +1,2 @@
 这个是用来爬取Nike官网关于鞋子的图片
+注：cookie需要到浏览器提取新的替换掉firstSpider中的cookie，因为有时效性的缘故。

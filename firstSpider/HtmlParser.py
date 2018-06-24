@@ -1,12 +1,12 @@
 # encoding: utf-8
 
-import re
-import urlparse
 from bs4 import BeautifulSoup
 from urllib import unquote
 from firstSpider.HtmlDownloader import HtmlDownloader
 from firstSpider.DataOutput import DataOutput
 import json
+import os
+import re
 class HtmlParser(object):
     def __init__(self):
         self.htmlDownloader = HtmlDownloader()
@@ -38,11 +38,11 @@ class HtmlParser(object):
         wrapper = soup.select('div.exp-gridwall-standard > div.exp-product-wall > div')
         # print len(wrapper)
         i = 0
-        headers = ['title', 'category', 'link', 'price']
+        headers = ['title', 'category', 'imgName', 'price']
         for child in wrapper:
             link =  child.div.div.div.div.a['href'].encode('utf8')
             imgLink = self.htmlDownloader.imgDownloader(link).encode('utf8')
-
+            imgFileName = self.getFileName(imgLink)
             name = child.div.select('.product-display-name')[0].string.encode('utf8')
             category =  child.div.select('.product-subtitle')[0].string.encode('utf8')
             price =  child.div.select('.local.nsg-font-family--base')[0].string.encode('utf8')
@@ -50,11 +50,11 @@ class HtmlParser(object):
                 name = ''
             if category == None:
                 category = ''
-            if imgLink == None:
-                imgLink = ''
+            if imgFileName == None:
+                imgFileName = ''
             if price == None:
                 price = '0'
-            data = {'title': name, 'category':category, 'link':imgLink, 'price': price}
+            data = {'title': name, 'category':category, 'imgName': imgFileName, 'price': price}
             print('目前下载进度： ' + str(i))
             i = i + 1
             self.dataOutput.datas.append(data)
@@ -85,4 +85,39 @@ class HtmlParser(object):
         if jsonData is None:
             return
         text = json.loads(jsonData)
-        print text['sections'][0]['items'][0]
+        itemsArr = text['sections'][0]['items']
+        # print text['sections'][0]['items']
+        i = 0
+        headers = ['title', 'category', 'imgName', 'price']
+        for item in itemsArr:
+            title = item['title'].encode('utf8')
+            category = item['subtitle'].encode('utf8')
+            price  = item['localPrice'].encode('utf8')
+            link = item['pdpUrl'].encode('utf8')
+            imgLink = self.htmlDownloader.imgDownloader(link).encode('utf8')
+            imgFileName = self.getFileName(imgLink)
+            if title == None:
+                title = ''
+            if category == None:
+                category = ''
+            if imgFileName == None:
+                imgFileName = ''
+            if price == None:
+                price = '0'
+            data = {'title': title, 'category': category, 'imgName': imgFileName, 'price': price}
+            print('Current Download Status： ' + str(i))
+            print data
+            i = i + 1
+            self.dataOutput.datas.append(data)
+        self.dataOutput.output_csv(headers)
+    def getFileName(self, url, file_path='', file_suffix=''):
+        queryArr = url.split('/')
+        strLen = len(queryArr)
+        name = queryArr[strLen - 1]
+        try:
+            if type(int(name[0])) == int:
+                name = 'a' + name
+        except Exception:
+            name = name
+        file_name = re.sub(r'.tif\?(\D)*$', '.jpg', name)
+        return '{}{}{}'.format(file_path, file_name, file_suffix)

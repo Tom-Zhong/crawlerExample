@@ -54,5 +54,5 @@ class SpiderMan(object):
 
 if __name__ == '__main__':
     spider_man = SpiderMan()
-    # spider_man.crawlHTML('https://store.nike.com/us/en_us/pw/mens-shoes/7puZoi3?ipp=120')
+    spider_man.crawlHTML('https://store.nike.com/us/en_us/pw/mens-shoes/7puZoi3?ipp=120')
     spider_man.crawlJSON('https://store.nike.com/html-services/gridwallData?country=US&lang_locale=en_US&gridwallPath=mens-shoes/7puZoi3&pn=', 3, 13)

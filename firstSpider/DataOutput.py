@@ -32,8 +32,8 @@ class DataOutput(object):
         fout.close()
 
     def output_csv(self, headers='name'):
-        with open('nikeShop.csv', 'w') as f:
+        with open('nikeShop.csv', 'a') as f:
             f_csv = csv.DictWriter(f,headers)
             f_csv.writeheader()
-            print self.datas
             f_csv.writerows(self.datas)
+        self.datas = []
